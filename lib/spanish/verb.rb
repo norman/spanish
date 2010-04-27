@@ -1,7 +1,7 @@
 module Spanish
 
   # A verb.
-  class Verb
+  class Verb < Word
 
     attr_reader :root
     attr_reader :type
