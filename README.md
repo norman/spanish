@@ -1,9 +1,11 @@
-# Spanish Verbs
+# Spanish
 
-This is (or rather, will be) a Spanish verb conjugator, written in Ruby.
+This library provides (or rather, will provide) some linguistic tools for
+working with Spanish words.
 
-The goal is to be able to correctly conjugate any Spanish infinitive verb.
+Plans include:
 
-Perhaps eventually it will also accept conjugated verbs, and return their
-infinitive. I haven't looked into the issue in enough detail to know how
-feasable this is, but it would be cool.
+* Syllabify any Spanish word.
+* Correctly conjugate any Spanish infinitive verb.
+* Given a conjugated verb, identify its conjugation and infinitive.
+* Correctly return gender, pluralization and agreement for nouns.

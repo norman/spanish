@@ -1,7 +1,6 @@
 require "test/unit"
-require File.expand_path("../../lib/spanish_verbs", __FILE__)
-
-include SpanishVerbs
+require File.expand_path("../../lib/spanish", __FILE__)
+include Spanish
 
 Test::Unit::TestCase.extend Module.new {
   def test(name, &block)

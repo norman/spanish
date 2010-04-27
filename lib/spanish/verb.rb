@@ -1,4 +1,4 @@
-module SpanishVerbs
+module Spanish
 
   # A verb.
   class Verb
