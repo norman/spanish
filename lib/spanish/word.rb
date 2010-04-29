@@ -5,8 +5,13 @@ module Spanish
     include Syllabification
 
     # An array of letters in the word
+    def self.letters(string)
+      string.scan LETTERS
+    end
+
+    # An array of letters in the word
     def letters
-      scan LETTERS
+      self.class.letters(self)
     end
 
   end
