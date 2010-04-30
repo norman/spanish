@@ -1,101 +1,34 @@
 # encoding: utf-8
-require "unicode"
 module Spanish
 
   module Phonology
 
+
     class Sound
 
-      FEATURES = {
-        :voiced      => 1 << 0,
-        :nasal       => 1 << 1,
-        :stop        => 1 << 2,
-        :fricative   => 1 << 3,
-        :trill       => 1 << 4,
-        :flap        => 1 << 5,
-        :lateral     => 1 << 6,
-        :labial      => 1 << 7,
-        :dental      => 1 << 8,
-        :alveolar    => 1 << 9,
-        :palatal     => 1 << 10,
-        :velar       => 1 << 11,
-        :high        => 1 << 12,
-        :mid         => 1 << 13,
-        :low         => 1 << 14,
-        :front       => 1 << 15,
-        :back        => 1 << 16,
-        :round       => 1 << 17,
-        :approximant => 1 << 18
-      }
+      @@inventory = ::Linguistics::Phonology::SoundInventory.new(
+        "i", "u", "e", "o", "a", "j", "w", "m", "n", "ɲ", "ŋ", "b", "d", "ʝ",
+        "g", "β", "ð", "z", "ʒ", "ɣ", "r", "ɾ", "l", "ʎ", "p", "t", "ʧ", "k",
+        "f", "θ", "s", "x"
+      )
 
-      FEATURES.each do |name, bits|
+      attr :feature_bits
+      attr_accessor :orthography
+
+      def initialize(*args)
+        @feature_bits = @@inventory.mask(*args)
+      end
+
+      @@inventory.class.features.each do |name, bits|
         class_eval(<<-EOM)
-          def #{name.to_s}?
-            @feature_bits & FEATURES[:#{name}] != 0
+          def #{name}?
+            @feature_bits & @@inventory.class.features[:#{name}] != 0
           end
         EOM
       end
 
-      SOUNDS = {
-        "i" => [:voiced, :high, :front],
-        "u" => [:voiced, :high, :back],
-        "e" => [:voiced, :mid, :front],
-        "o" => [:voiced, :mid, :back, :round],
-        "a" => [:voiced, :low, :back],
-
-        "j" => [:voiced, :palatal, :approximant],
-        "w" => [:voiced, :labial, :velar, :approximant],
-
-        "m" => [:voiced, :nasal, :labial],
-        "n" => [:voiced, :nasal, :alveolar],
-        "ɲ" => [:voiced, :nasal, :palatal],
-        "ŋ" => [:voiced, :nasal, :velar],
-
-        "b" => [:voiced, :labial, :stop],
-        "d" => [:voiced, :dental, :stop],
-        "ʝ" => [:voiced, :palatal, :stop],
-        "g" => [:voiced, :velar, :stop],
-
-        "β" => [:voiced, :labial, :fricative],
-        "ð" => [:voiced, :dental, :fricative],
-        "z" => [:voiced, :alveolar, :fricative],
-        "ʒ" => [:voiced, :palatal, :fricative],
-        "ɣ" => [:voiced, :velar, :fricative],
-
-        "r" => [:voiced, :alveolar, :trill],
-
-        "ɾ" => [:voiced, :alveolar, :flap],
-
-        "l" => [:voiced, :alveolar, :lateral],
-        "ʎ" => [:voiced, :palatal, :lateral],
-
-        "p" => [:labial, :stop],
-        "t" => [:dental, :stop],
-        "ʧ" => [:palatal, :stop],
-        "k" => [:velar, :stop],
-
-        "f" => [:labial, :fricative],
-        "θ" => [:dental, :fricative],
-        "s" => [:alveolar, :fricative],
-        "x" => [:velar, :fricative]
-      }
-
-      def self.feature_matrix(args)
-        args.inject(0) {|memo, object| memo += FEATURES[object]}
-      end
-
-      FEATURE_MAP = Hash[SOUNDS.map {|letter, features| [letter, feature_matrix(features)]}]
-
-      def initialize(*args)
-        @feature_bits = 0
-        if args.size == 1 && args.first.kind_of?(String)
-          args = SOUNDS[args.shift]
-        end
-        args.each {|a| add a}
-      end
-
       def vocalic?
-        high? || mid? || low?
+        @feature_bits >= @@inventory.class.features[:high]
       end
 
       def consonantal?
@@ -103,15 +36,25 @@ module Spanish
       end
 
       def symbol
-        FEATURE_MAP.key @feature_bits
+        @@inventory.symbol @feature_bits
       end
 
-      def add(symbol)
-        @feature_bits += FEATURES[symbol.to_sym]
+      def add(*features)
+        @feature_bits |= @@inventory.mask(features)
+        self
       end
+      alias << add
 
-      def sub(symbol)
-        @feature_bits -= FEATURES[symbol.to_sym]
+      def del(*features)
+        @feature_bits &= ~@@inventory.mask(features)
+        self
+      end
+      alias >> del
+
+      # Replace `to_del` with `to_add`
+      def swap(to_del, to_add)
+        add *to_add
+        del *to_del
       end
 
     end
@@ -122,27 +65,24 @@ module Spanish
     attr_reader :sounds
 
 
-    def feature_matrix(*args)
-    end
-
-
-
     SEQUENCES = /qu|
       gue|gui|güi|güe|ge|gi|gué|guí|güí|güé|gé|gí|
+      ua|ui|ue|uo|
+      ci|ce|
       rr|ch|ll|
       á|é|í|ó|ú|ü|ñ|
       [\w]/xu
 
     @approximations = {
-      "b"   => "B",
+      "b"   => "β",
       "c"   => "k",
       "ce"  => ["s", "e"],
       "ch"  => "c",
       "ci"  => ["s", "i"],
       "cé"  => ["s", "e"],
       "cí"  => ["s", "i"],
-      "d"   => "D",
-      "g"   => "G",
+      "d"   => "ð",
+      "g"   => "ɣ",
       "gue" => ["g", nil, "e"],
       "gui" => ["g", nil, "i"],
       "güi" => ["g", "w", "i"],
@@ -158,84 +98,101 @@ module Spanish
       "ie"  => ["j", "e"],
       "io"  => ["j", "o"],
       "j"   => "x",
-      "ll"  => "z",
-      "q"   => "q",
+      "ll"  => "ʒ",
+      "q"   => "k",
       "qu"  => ["k", nil],
-      "rr"  => "R",
+      "r"   => "ɾ",
+      "rr"  => "r",
       "ua"  => ["w", "a"],
       "ue"  => ["w", "e"],
       "ui"  => ["w", "i"],
       "uo"  => ["w", "o"],
-      "v"   => "B",
+      "v"   => "β",
       "z"   => "s",
-      "ñ"   => "ñ",
+      "ñ"   => "ɲ",
       "üe"  => ["w", "e"],
       "üi"  => ["w", "i"],
+      "y"   => "j"
     }
 
     def sounds(string)
-      sequences = string.scan(SEQUENCES)
       sounds = []
-      sequences.each_with_index do |seq, index|
+      sound = nil
+      sequences = string.scan(SEQUENCES)
+      sequences.each do |seq|
         if approx = @approximations[seq]
           if approx.kind_of?(Array)
-            sounds += [approx, seq.split('')].transpose
+            [approx, seq.split('')].transpose.each do |s, o|
+              if s == nil
+                sound.orthography << o
+              else
+                sound = Sound.new(s)
+                sound.orthography = o
+                sounds << sound
+              end
+            end
           else
-            sounds << [approx, seq]
+            sound = Sound.new(approx)
+            sound.orthography = seq
+            sounds << sound
           end
         else
-          sounds << [strip_diacritic(seq), seq]
+          sound = Sound.new(strip_diacritic(seq))
+          sound.orthography = seq
+          sounds << sound
         end
       end
       apply_rules(sounds)
     end
 
-    private
-
     def apply_rules(sounds)
       max = sounds.length
       sounds.each_index do |i|
-        prv = i > 0 ? sounds[i-1] : nil
-        nex = i < max ? sounds[i+1] : nil
+
+        prv = sounds[i-1] if i > 0
+        nex = sounds[i+1] if i < max
         cur = sounds[i]
 
-        # othorgraphic rules for "y"
-        if cur[0] == "y"
-          if nex && nex[0] =~ VOWEL
-            # @TODO don't assume Rioplatense
-            cur[0] = "z"
-          else
-            cur[0] = "i"
+        if cur.symbol == "j"
+          # "y" to "i"
+          if (!prv && !nex) || ((!prv || prv && !prv.vocalic?) && nex && !nex.vocalic?)
+            cur.swap([:palatal, :approximant], [:high, :front])
           end
+          # rioplatense "y"
+          cur.swap(:approximant, :fricative) if nex && nex.vocalic?
         end
 
         # word-initial "r"
-        cur[0] = "R" if i == 0 && cur[0] == "r"
+        cur.swap(:flap, :trill) if cur.symbol == "ɾ" && !prv
 
         # defricativization
-        if !prv || prv[0] =~ NASAL
-          case cur[0]
-          when "B" then cur[0] = "b"
-          when "G" then cur[0] = "g"
-          when "D" then cur[0] = "d"
-          end
-        elsif prv && prv[0] =~ /l/
-          cur[0] = "d" if cur[0] == "D"
+        if cur.voiced? && cur.fricative? && (cur.labial? || cur.dental? || cur.velar?)
+          cur.swap(:fricative, :stop) if (!prv || prv.nasal?)
+          cur.swap(:fricative, :stop) if (cur.dental? && prv && prv.lateral?)
         end
 
         # voicing
-        if cur[0] == "s" && nex && nex[0] =~ /g|G|d|D|m|n/
-          cur[0] = "z"
+        if cur.fricative? && cur.alveolar? && nex && nex.consonantal? && nex.voiced?
+          cur << :voiced
         end
 
       end
       sounds
     end
 
-    def strip_diacritic(string)
-      Unicode.normalize_KD(string).gsub(/[^\x00-\x7f]/, '')
-    end
+    private
 
+    def strip_diacritic(letter)
+      approximations = {
+        "á" => "a",
+        "é" => "e",
+        "í" => "i",
+        "ó" => "o",
+        "ú" => "u",
+        "ü" => "u"
+      }
+      approximations[letter] or letter
+    end
 
   end
 

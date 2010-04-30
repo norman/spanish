@@ -13,10 +13,16 @@ class Sound < Test::Unit::TestCase
     assert sound.consonantal?
   end
 
-  test "should change symbol for changed features" do
+  test "should get sound from features" do
+    sound = Sound.new(:labial, :stop)
+    assert_equal "p", sound.symbol
+  end
+
+  test "should change symbol for added features" do
     sound = Sound.new("s")
-    sound.add :voiced
+    sound << :voiced
     assert_equal "z", sound.symbol
   end
+
 
 end

@@ -1,4 +1,5 @@
 # encoding: utf-8
+require File.expand_path("../linguistics/phonology", __FILE__)
 require File.expand_path("../spanish/syllabification", __FILE__)
 require File.expand_path("../spanish/word", __FILE__)
 require File.expand_path("../spanish/verb", __FILE__)
