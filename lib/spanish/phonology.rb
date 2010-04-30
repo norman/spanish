@@ -4,44 +4,136 @@ module Spanish
 
   module Phonology
 
+    class Sound
+
+      FEATURES = {
+        :voiced      => 1 << 0,
+        :nasal       => 1 << 1,
+        :stop        => 1 << 2,
+        :fricative   => 1 << 3,
+        :trill       => 1 << 4,
+        :flap        => 1 << 5,
+        :lateral     => 1 << 6,
+        :labial      => 1 << 7,
+        :dental      => 1 << 8,
+        :alveolar    => 1 << 9,
+        :palatal     => 1 << 10,
+        :velar       => 1 << 11,
+        :high        => 1 << 12,
+        :mid         => 1 << 13,
+        :low         => 1 << 14,
+        :front       => 1 << 15,
+        :back        => 1 << 16,
+        :round       => 1 << 17,
+        :approximant => 1 << 18
+      }
+
+      FEATURES.each do |name, bits|
+        class_eval(<<-EOM)
+          def #{name.to_s}?
+            @feature_bits & FEATURES[:#{name}] != 0
+          end
+        EOM
+      end
+
+      SOUNDS = {
+        "i" => [:voiced, :high, :front],
+        "u" => [:voiced, :high, :back],
+        "e" => [:voiced, :mid, :front],
+        "o" => [:voiced, :mid, :back, :round],
+        "a" => [:voiced, :low, :back],
+
+        "j" => [:voiced, :palatal, :approximant],
+        "w" => [:voiced, :labial, :velar, :approximant],
+
+        "m" => [:voiced, :nasal, :labial],
+        "n" => [:voiced, :nasal, :alveolar],
+        "ɲ" => [:voiced, :nasal, :palatal],
+        "ŋ" => [:voiced, :nasal, :velar],
+
+        "b" => [:voiced, :labial, :stop],
+        "d" => [:voiced, :dental, :stop],
+        "ʝ" => [:voiced, :palatal, :stop],
+        "g" => [:voiced, :velar, :stop],
+
+        "β" => [:voiced, :labial, :fricative],
+        "ð" => [:voiced, :dental, :fricative],
+        "z" => [:voiced, :alveolar, :fricative],
+        "ʒ" => [:voiced, :palatal, :fricative],
+        "ɣ" => [:voiced, :velar, :fricative],
+
+        "r" => [:voiced, :alveolar, :trill],
+
+        "ɾ" => [:voiced, :alveolar, :flap],
+
+        "l" => [:voiced, :alveolar, :lateral],
+        "ʎ" => [:voiced, :palatal, :lateral],
+
+        "p" => [:labial, :stop],
+        "t" => [:dental, :stop],
+        "ʧ" => [:palatal, :stop],
+        "k" => [:velar, :stop],
+
+        "f" => [:labial, :fricative],
+        "θ" => [:dental, :fricative],
+        "s" => [:alveolar, :fricative],
+        "x" => [:velar, :fricative]
+      }
+
+      def self.feature_matrix(args)
+        args.inject(0) {|memo, object| memo += FEATURES[object]}
+      end
+
+      FEATURE_MAP = Hash[SOUNDS.map {|letter, features| [letter, feature_matrix(features)]}]
+
+      def initialize(*args)
+        @feature_bits = 0
+        if args.size == 1 && args.first.kind_of?(String)
+          args = SOUNDS[args.shift]
+        end
+        args.each {|a| add a}
+      end
+
+      def vocalic?
+        high? || mid? || low?
+      end
+
+      def consonantal?
+        !vocalic?
+      end
+
+      def symbol
+        FEATURE_MAP.key @feature_bits
+      end
+
+      def add(symbol)
+        @feature_bits += FEATURES[symbol.to_sym]
+      end
+
+      def sub(symbol)
+        @feature_bits -= FEATURES[symbol.to_sym]
+      end
+
+    end
+
     extend self
 
     attr_reader :sonorities
     attr_reader :sounds
 
-    SEQUENCES = /gue|gui|güi|güe|ge|gi|gué|guí|güí|güé|gé|gí|
-      ci|cí|ce|cé|
-      qu|rr|ch|ll|
-      ai|au|ie|io|ua|ue|üe|ui|üi|uo|
+
+    def feature_matrix(*args)
+    end
+
+
+
+    SEQUENCES = /qu|
+      gue|gui|güi|güe|ge|gi|gué|guí|güí|güé|gé|gí|
+      rr|ch|ll|
       á|é|í|ó|ú|ü|ñ|
       [\w]/xu
 
-    VOWEL    = /a|e|i|o|u/
-    VOICED   = /b|B|d|D|G|g|l|m|n|r|R|z|j|v|w|a|e|i|o|u/
-    CONSONANT = /b|B|c|d|f|g|G|k|l|m|n|p|r|R|s|t|v|x|z/
-    NASAL    = /m|n/
-    UNVOICED = /k|s|f|t|p|x/
-
-    # "R" = trilled "r", "r" = flap
-    # "B" = fricative, "b" = stop
-    # "D" = fricative, "d" = stop
-    # "G" = fricative, "g" = stop
-    # "c" = palatal ("ch")
-    # "z" = fricative (Rioplatense "ll")
-    # "j" = glide
-    @sonorities = {
-      0 => ["b", "c", "d", "D", "f", "g", "G", "k", "p", "R", "s", "t", "x", "z"],
-      1 => ["l", "r"],
-      2 => ["n", "ñ", "m"],
-      3 => ["j", "w"],
-      4 => ["a", "e", "i", "o", "u"]
-    }
-
-    @sounds = Hash[*sonorities.map {|s, g| g.map {|c| [c, s]}}.flatten]
-
     @approximations = {
-      "ai"  => ["a", "j"],
-      "au"  => ["a", "w"],
       "b"   => "B",
       "c"   => "k",
       "ce"  => ["s", "e"],
