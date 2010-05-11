@@ -1,7 +1,13 @@
 require "rake/testtask"
-task :default => :test
-Rake::TestTask.new(:test) { |t| t.pattern = "test/**/*_test.rb" }
+require "rake/gempackagetask"
+require "rake/clean"
 
+CLEAN << "pkg" << "doc" << "coverage" << ".yardoc"
+
+task :default => :test
+
+Rake::TestTask.new(:test) { |t| t.pattern = "test/**/*_test.rb" }
+Rake::GemPackageTask.new(eval(File.read("spanish.gemspec"))) { |pkg| }
 
 begin
   require 'reek/rake/task'

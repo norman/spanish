@@ -3,8 +3,6 @@ require File.expand_path("../test_helper", __FILE__)
 
 class PhonologyTest < Test::Unit::TestCase
 
-  include Spanish
-
   test "c as s or k" do
     assert_sound "kasa", "casa"
     assert_sound "bisi", "bici"
@@ -12,7 +10,7 @@ class PhonologyTest < Test::Unit::TestCase
   end
 
   test "g as ɣ, g, or x" do
-    assert_sound "gustaβo", "gustavo"
+    assert_sound "ɡustaβo", "gustavo"
     assert_sound "laɣo", "lago"
     assert_sound "ximena", "gimena"
     assert_sound "xeɾman", "germán"
@@ -25,7 +23,7 @@ class PhonologyTest < Test::Unit::TestCase
 
   test "y" do
     assert_sound "i", "y"
-    assert_sound "kaʒo", "cayó"
+    assert_sound "kaʝo", "cayó"
     assert_sound "iɣwasu", "yguazú"
     assert_sound "doj", "doy"
   end
@@ -43,17 +41,23 @@ class PhonologyTest < Test::Unit::TestCase
 
   test "q, g and u" do
     assert_sound "ke", "que"
-    assert_sound "gwemes", "güemes"
-    assert_sound "gera", "guerra"
-    assert_sound "giɲo", "guiño"
-    assert_sound "pingwino", "pingüino"
+    assert_sound "ɡwemes", "güemes"
+    assert_sound "ɡera", "guerra"
+    assert_sound "ɡiɲo", "guiño"
+    assert_sound "pinɡwino", "pingüino"
+  end
+
+  test "diphthongs" do
+    # assert_sound "buo", "buho"
+    assert_sound "pua", "púa"
+    assert_sound "oeste",  "oeste"
   end
 
   private
 
   def assert_sound(expected, given)
-    assert_equal expected, Phonology.sounds(given).map(&:symbol).join
-    assert_equal given, Phonology.sounds(given).map(&:orthography).join
+    assert_equal expected, Spanish.get_ipa(given)
+    assert_equal given.downcase, Spanish.get_sounds(given).map(&:orthography).join
   end
 
 end
