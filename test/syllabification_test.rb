@@ -3,57 +3,41 @@ require File.expand_path("../test_helper", __FILE__)
 
 class SyllabificationTest < Test::Unit::TestCase
 
+  include Phonology
+  include Spanish
 
-    CASES = {
-      "perro"           => ["pe", "rro"],
-      "triple"          => ["tri", "ple"],
-      "castro"          => ["cas", "tro"],
-      "caldo"           => ["cal", "do"],
-      "orden"           => ["or", "den"],
-      "él"              => ["él"],
-      "fue"             => ["fue"],
-      "fuí"             => ["fuí"],
-      "feo"             => ["fe", "o"],
-      "adjuntar"        => ["ad", "jun", "tar"],
-      "gato"            => ["ga", "to"],
-      "palo"            => ["pa", "lo"],
-      "para"            => ["pa", "ra"],
-      "explicar"        => ["ex", "pli", "car"],
-      "increíble"       => ["in", "cre", "í", "ble"],
-      "estéreo"         => ["es", "té", "re", "o"],
-      "estudioso"       => ["es", "tu", "dio", "so"],
-      "australiano"     => ["aus", "tra", "lia", "no"],
-      "empleado"        => ["em", "ple", "a", "do"],
-      "abierto"         => ["a", "bier", "to"],
-      "suizo"           => ["sui", "zo"],
-      "ingenuo"         => ["in", "ge", "nuo"],
-      "policía"         => ["po", "li", "cí", "a"],
-      "mayo"            => ["ma", "yo"],
-      "malla"           => ["ma", "lla"],
-      "láica"           => ["lái", "ca"],
-      "atrás"           => ["a", "trás"],
-      "reloj"           => ["re", "loj"],
-      "haras"           => ["ha", "ras"],
-      "bahía"           => ["ba", "hí", "a"],
-      "azahar"          => ["a", "za", "har"],
-      "ella"            => ["e", "lla"],
-      "televisión"      => ["te", "le", "vi", "sión"],
-      "posparto"        => ["pos", "par", "to"],
-      "subrayar"        => ["sub", "ra", "yar"],
-      "desorden"        => ["des", "or", "den"],
-      "dieciseis"       => ["die", "ci", "seis"],
-      "auxiliar"        => ["au", "xi", "liar"],
-      "baile"           => ["bai", "le"],
-      "lavándose"       => ["la", "ván", "do", "se"],
-      "botnia"          => ["bot", "nia"],
-      "ovni"            => ["ov", "ni"],
-      "parapsicología"  => ["pa", "rap", "si", "co", "lo", "gi", "a"]
-    }
+  test "should add consonant to empty onset" do
+    s = Syllable.new
+    assert s.onset_wants? Sound.new("t")
+    assert s.onset_wants? Sound.new("l")
+    assert s.onset_wants? Sound.new("w")
+  end
 
-    # test "should syllabify basic cases" do
-    #   CASES.each do |given, expected|
-    #     assert_equal expected, Word.new(given).syllables
-    #   end
-    # end
+  test "should not add vowel to empty onsent" do
+    s = Syllable.new
+    assert !s.onset_wants?(Sound.new("o"))
+  end
+
+  test "can append consonant to onset if liquid" do
+    s = Syllable.new
+    s.onset << Sound.new("t")
+    assert s.onset_wants? Sound.new("l")
+    assert s.onset_wants? Sound.new("ɾ")
+  end
+
+  test "can append consonant to onset if approximant" do
+    s = Syllable.new
+    s.onset << Sound.new("k")
+    assert s.onset_wants? Sound.new("w")
+  end
+
+  test "can not append sound to onset if non-liquid and non-approximant" do
+    s = Syllable.new
+    s.onset << Sound.new("k")
+    assert !s.onset_wants?(Sound.new("n"))
+    assert !s.onset_wants?(Sound.new("r"))
+    assert !s.onset_wants?(Sound.new("s"))
+    assert !s.onset_wants?(Sound.new("a"))
+  end
 
 end

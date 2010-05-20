@@ -9,6 +9,10 @@ class PhonologyTest < Test::Unit::TestCase
     assert_sound "fɾanko", "franco"
   end
 
+  test "x" do
+    assert_sound "eksamen", "examen"
+  end
+
   test "g as ɣ, g, or x" do
     assert_sound "ɡustaβo", "gustavo"
     assert_sound "laɣo", "lago"
@@ -16,7 +20,9 @@ class PhonologyTest < Test::Unit::TestCase
     assert_sound "xeɾman", "germán"
   end
 
-  test "defricitivization" do
+  test "sprirantization" do
+    assert_sound "alɣo", "algo"
+    assert_sound "ranɡo", "rango"
     assert_sound "kaldo", "caldo"
     assert_sound "kandaðo", "candado"
   end
@@ -48,7 +54,7 @@ class PhonologyTest < Test::Unit::TestCase
   end
 
   test "diphthongs" do
-    # assert_sound "buo", "buho"
+    assert_sound "buo", "buho"
     assert_sound "pua", "púa"
     assert_sound "oeste",  "oeste"
   end
