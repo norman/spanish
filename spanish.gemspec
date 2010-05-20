@@ -12,4 +12,6 @@ Gem::Specification.new do |s|
   s.platform     = Gem::Platform::RUBY
   s.require_path = 'lib'
   s.rubyforge_project = '[none]'
+  s.add_dependency "phonology", ">= 0.0.5"
+  s.required_ruby_version = ">= 1.9"
 end
