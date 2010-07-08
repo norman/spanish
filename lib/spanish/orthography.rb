@@ -78,7 +78,7 @@ module Spanish
         if initial?
           get(:unvoiced, :velar, :fricative)
         else
-          [get(:unvoiced, :velar, :plosive), Phonology::Sound.new("s")]
+          [get(:unvoiced, :velar, :plosive), ::Phonology::Sound.new("s")]
         end
 
       when "y"
