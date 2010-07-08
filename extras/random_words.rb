@@ -1,4 +1,7 @@
 # encoding: utf-8
+require "rubygems"
+require "bundler"
+Bundler.setup
 require File.expand_path("../../init.rb", __FILE__)
 
 words = File.read(File.expand_path("../spanish.txt", __FILE__)).split("\n")

@@ -1,3 +1,6 @@
+require "rubygems"
+require "bundler"
+Bundler.setup
 require "test/unit"
 require File.expand_path("../../lib/spanish", __FILE__)
 include Spanish
