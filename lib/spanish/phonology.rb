@@ -17,6 +17,9 @@ module Spanish
             add :fricative, :dental
           end
         end
+      },
+      :nasal_assimilation => ::Phonology::Rule.new {
+        add :bilabial if nasal? and precedes :bilabial
       }
     }
     @optional_rules = {
@@ -27,38 +30,31 @@ module Spanish
         voice if alveolar? and fricative? and precedes(:voiced, :non_vocoid)
       },
       :aspiration => ::Phonology::Rule.new {
-        if alveolar? and fricative? and follows(:vocoid) and syllable_final?
-          add! :approximant
-          add! :fricative
+        if syllable_final? and alveolar? and fricative? and follows(:vocoid)
+          devoice
           add :glottal
-          delete :voiced
+          add! :approximant
         end
       },
       :yeismo => ::Phonology::Rule.new {
-        if lateral_approximant?
-          add :palatal
-          add :fricative
+        if palatal? and (lateral_approximant? or fricative?)
+          add :palatal, :fricative
         end
       },
       :lleismo => ::Phonology::Rule.new {
-        if palatal? and fricative?
-          add :lateral_approximant
-        end
+        add :lateral_approximant if (palatal? and fricative?)
       },
       :zheismo => ::Phonology::Rule.new {
         if palatal? and (lateral_approximant? or fricative?)
-          add :postalveolar
-          add :fricative
+          add :postalveolar, :fricative
         end
       },
       :sheismo => ::Phonology::Rule.new {
         if palatal? and (lateral_approximant? or fricative?)
-          add :postalveolar
-          add :fricative
+          add :postalveolar, :fricative
           delete :voiced
         end
-      },
-
+      }
     }
 
     def apply_rules(array)
