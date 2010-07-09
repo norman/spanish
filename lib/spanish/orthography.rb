@@ -1,13 +1,9 @@
 # encoding: utf-8
 module Spanish
   module Orthography
-
     extend self
-
     LETTERS = /ch|ll|ñ|á|é|í|ó|ú|ü|[\w]/
-
     SCANNER = lambda {|string| string.downcase.scan(/rr|ch|ll|ñ|á|é|í|ó|ú|ü|\w/)}
-
     SOUNDS = ::Phonology::Inventory.from_ipa(
       "m", "n", "ɲ", "ŋ", "p", "b", "t", "d", "k", "ɡ", "β", "f", "v", "ð", "s",
       "z", "ʒ", "ʝ", "x", "ɣ", "j", "r", "ɾ", "l", "w", "i", "u", "e", "o", "a",
@@ -80,7 +76,6 @@ module Spanish
         else
           [get(:unvoiced, :velar, :plosive), ::Phonology::Sound.new("s")]
         end
-
       when "y"
         if initial? && final?
           get(:close, :front)
@@ -93,7 +88,10 @@ module Spanish
         elsif !precedes(vowel)
           get(:palatal, :approximant)
         end
-      when "z" then get(:unvoiced, :dental, :fricative)
+      when "z"
+        # Spanish final "z" indicates stress: i.e. "madures" vs. "madurez"
+        last_sound.hint(:primary_stress) if final? and follows(vowel)
+        get(:unvoiced, :dental, :fricative)
       end
     }
 
