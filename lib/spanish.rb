@@ -21,8 +21,12 @@ module Spanish
   # Get an array of Phonology::Sounds from the string.
   def get_sounds(string, *rules)
     sequence = Orthography.translator.translate(string)
-    Phonology.rules.values.each do |rule|
-      sequence.apply_rule!(rule)
+    Syllabifier.syllabify(sequence)
+    Phonology.general_rules.values.each do |rule|
+      rule.apply(sequence)
+    end
+    rules.each do |rule|
+      Phonology.optional_rules[rule.to_sym].apply(sequence)
     end
     sequence
   end
@@ -32,8 +36,16 @@ module Spanish
   #
   #     Spanish.get_ipa("chavo")
   #     # => 't͡ʃaβo
-  def get_ipa(string)
-    get_sounds(string).to_s
+  def get_ipa(string, *rules)
+    get_sounds(string, *rules).to_s
   end
 
+  def get_syllables(string, *rules)
+    get_sounds(string, *rules).map(&:syllable).uniq
+  end
+
+  def get_syllables_ipa(string, *rules)
+    syllables = get_syllables(string, *rules)
+    syllables.map {|s| syllables.length == 1 ? s.to_s(false) : s.to_s }.join(" ")
+  end
 end

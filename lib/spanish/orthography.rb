@@ -106,7 +106,5 @@ module Spanish
       orth.rules   = RULES
       orth
     end
-
   end
-
 end

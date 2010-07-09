@@ -36,7 +36,10 @@ private
 
 def get_ipa(words)
   words = words.force_encoding "UTF-8"
-  words.split(/\s+/u).map {|word| Spanish::Syllable.syllabify(word).map {|s| s.to_s }.join(" ")}
+  words.split(/\s+/u).map do |word|
+    trans = Spanish.get_sounds(word, :seseo, :zheismo, :aspiration)
+    Spanish::Syllable.syllabify(trans).map {|s| s.to_s }.join(" ")
+  end
 end
 
 __END__
