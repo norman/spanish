@@ -26,6 +26,8 @@ module Spanish
     def coda_wants?(sound)
       if nucleus.empty?
         false
+      elsif !coda.empty?
+        false if coda.last.approximant?
       else
         # Codas don't want a rising dipthong but will accept one at the end of words.
         sound.consonantal? && !(sound.approximant? && sound.palatal?)
