@@ -5,7 +5,7 @@ class PhonologyTest < Test::Unit::TestCase
 
   test "c as s or k" do
     assert_sound "kasa", "casa"
-    assert_sound "bisi", "bici"
+    assert_sound "biθi", "bici"
     assert_sound "fɾanko", "franco"
   end
 
@@ -30,13 +30,13 @@ class PhonologyTest < Test::Unit::TestCase
   test "y" do
     assert_sound "i", "y"
     assert_sound "kaʝo", "cayó"
-    assert_sound "iɣwasu", "yguazú"
+    assert_sound "iɣwaθu", "yguazú"
     assert_sound "doj", "doy"
   end
 
   test "voicing" do
-    assert_sound "razɣo", "rasgo"
-    assert_sound "xazmin", "jazmín"
+    assert_sound "rasɣo", "rasgo"
+    assert_sound "xaθmin", "jazmín"
   end
 
   test "trilled r and flap r" do
