@@ -5,6 +5,22 @@ class SyllabificationTest < Test::Unit::TestCase
 
   include Spanish
 
+  test "should syllabify and apply stree rules to single sound word" do
+    sequence = ::Phonology::SoundSequence.new(::Phonology::Sound.new("o"))
+    assert Syllabifier.syllabify(sequence).first.stress
+  end
+
+  test "should syllabify and apply stree rules to multi sound word" do
+    sequence =  Orthography.translator.translate("hola")
+    Syllabifier.new(sequence)
+  end
+
+end
+
+class SyllableTest < Test::Unit::TestCase
+
+  include Spanish
+
   test "should add consonant to empty onset" do
     s = Syllable.new
     assert s.onset_wants? Phonology::Sound.new("t")

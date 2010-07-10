@@ -44,11 +44,13 @@ module Spanish
 
     include Enumerable
 
-    attr :index, :sounds, :syllable
+    attr :index
+    attr :sounds
+    attr :syllable
 
     def self.apply_stress(syllables)
-      if syllables.detect {|s| s.stress}
-      elsif syllables.length == 1
+      return syllables if syllables.detect {|s| s.stress}
+      if syllables.length == 1
         syllables[0].stress = true
       else
         last = syllables.last.to_a
