@@ -67,7 +67,14 @@ module Spanish
 
     def self.syllabify(arg)
       arg = arg.kind_of?(String) ? Spanish.get_sounds(arg) : arg
-      apply_stress(new(arg).entries)
+      syllables = new(arg).entries
+      # Loanwords like "seltz" can be problematic; if we reach the end and have an invalid
+      # syllable, append it to the preceding syllable's coda.
+      if syllables.length > 1 and !syllables.last.valid?
+        final = syllables.pop
+        final.to_a.each {|s| syllables.last << s}
+      end
+      apply_stress(syllables)
     end
 
     def initialize(sounds)
