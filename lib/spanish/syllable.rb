@@ -18,8 +18,9 @@ module Spanish
         true
       elsif nucleus.last != sound
         !nucleus.last.hints.include?(:primary_stress) &&
-          !sound.hints.include?(:syllable_boundary) &&
-          (nucleus.last.close? || !nucleus.last.close? && sound.close?)
+        !sound.hints.include?(:primary_stress) &&
+        !sound.hints.include?(:syllable_boundary) &&
+        (nucleus.last.close? || !nucleus.last.close? && sound.close?)
       end
     end
 
