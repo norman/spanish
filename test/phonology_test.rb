@@ -53,6 +53,17 @@ class PhonologyTest < Test::Unit::TestCase
     assert_sound "pinɡwino", "pingüino"
   end
 
+  test "word-initial ps" do
+    assert_sound "sikoloxia", "psicología"
+  end
+
+  test "x archaism" do
+    assert_sound "mexiko", "México"
+    assert_sound "eksmexikano", "exmexicano"
+    assert_sound "kixote", "Quixote"
+    assert_sound "kixotesko", "quixotesco"
+  end
+
   test "diphthongs" do
     assert_sound "buo", "buho"
     assert_sound "pua", "púa"

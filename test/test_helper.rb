@@ -1,3 +1,4 @@
+$KCODE = "U" if RUBY_VERSION < "1.9"
 require "rubygems"
 require "bundler"
 Bundler.setup

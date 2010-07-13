@@ -47,7 +47,12 @@ module Spanish
       when "ñ"  then get(:palatal, :nasal)
       when "ó"  then get(:close_mid, :back).hint(:primary_stress)
       when "o"  then get(:close_mid, :back)
-      when "p"  then get(:unvoiced, :bilabial, :plosive)
+      when "p"
+        if initial? and precedes("s")
+          anticipate {|sound| sound.orthography.insert(0, "p")}
+        else
+          get(:unvoiced, :bilabial, :plosive)
+        end
       when "q"  then get(:unvoiced, :velar, :plosive)
       when "r"  then initial? ? get(:trill) : get(:flap)
       when "rr" then get(:trill)
@@ -71,7 +76,7 @@ module Spanish
       when "v"  then get(:voiced, :bilabial, :plosive)
       when "w"  then get(:velar, :approximant)
       when "x"
-        if initial?
+        if initial? or context("me", "ic") or context("mé", "ic") or context("qui", "ot") # exceptions for "México and Quixote"
           get(:unvoiced, :velar, :fricative)
         else
           [get(:unvoiced, :velar, :plosive), ::Phonology::Sound.new("s")]
