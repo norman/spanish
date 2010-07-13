@@ -30,7 +30,7 @@ module Spanish
         voice if alveolar? and fricative? and precedes(:voiced, :non_vocoid)
       },
       :aspiration => ::Phonology::Rule.new {
-        if syllable_final? and alveolar? and fricative? and follows(:vocoid) and !final?
+        if syllable_final? and alveolar? and fricative? and follows(:vocoid) and next_sound
           devoice
           add :glottal
           add! :approximant
