@@ -100,7 +100,7 @@ module Spanish
       end
     }
 
-    # Get an instance of Phonology::OrthographyTranslater with scanner and sound
+    # Get an instance of Phonology::OrthographyTranslator with scanner and sound
     # inventory set for Spanish.
     def translator
       orth = ::Phonology::OrthographyTranslator.new
